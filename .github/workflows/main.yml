@@ -50,7 +50,10 @@ jobs:
         
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f ./k8s/
+        # List files in current directory
+        ls -la
+        # Apply all yaml files in current directory
+        kubectl apply -f .
         kubectl wait --for=condition=available --timeout=300s deployment --all -n default
 
     - name: Verify deployment
