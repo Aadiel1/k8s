@@ -34,9 +34,7 @@ jobs:
 
     - name: Verify GCP credentials
       run: |
-        # Verify project configuration
         gcloud config list project
-        # Verify authentication
         gcloud auth list
 
     - name: Get GKE credentials
@@ -52,15 +50,7 @@ jobs:
         
     - name: Deploy to Kubernetes
       run: |
-        # Apply any changes to ConfigMaps or Secrets first
-        if [ -d "./k8s/configs" ]; then
-          kubectl apply -f ./k8s/configs/
-        fi
-        
-        # Apply main application manifests
         kubectl apply -f ./k8s/
-        
-        # Wait for deployments to be ready
         kubectl wait --for=condition=available --timeout=300s deployment --all -n default
 
     - name: Verify deployment
@@ -72,5 +62,4 @@ jobs:
     - name: Post-deployment cleanup
       if: always()
       run: |
-        # Add any cleanup steps here if needed
         echo "Deployment process completed"
