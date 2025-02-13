@@ -10,22 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Check out the repository
+    # 1. Checkout the repository
     - name: Checkout code
       uses: actions/checkout@v3
 
     # 2. Set up Google Cloud SDK
-    - name: Authenticate to Google Cloud
+    - name: Set up gcloud
       uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: ${{ secrets.GCP_PROJECT }}
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
 
-    # 3. Decode and use the service account key
+    # 3. Install gke-gcloud-auth-plugin
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+
+    # 4. Authenticate to GKE
     - name: Authenticate to GKE
-      env:
-        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       run: |
         echo "$GCP_SA_KEY" > $HOME/gcloud-key.json
         gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
@@ -33,7 +35,7 @@ jobs:
         gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
         kubectl version --client
 
-    # 4. Deploy Kubernetes manifests
+    # 5. Deploy Kubernetes manifests
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f .
