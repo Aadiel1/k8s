@@ -21,11 +21,13 @@ jobs:
 
     - name: Verify GCP SA Key
       run: |
+        # Ensure the secret is being correctly written into a JSON file
         echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-key.json
         cat $HOME/gcloud-key.json
 
     - name: Authenticate to GKE
       run: |
+        # Authenticate using the service account key file
         echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcloud-key.json
         gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
         gcloud config set project ${{ secrets.GCP_PROJECT }}
