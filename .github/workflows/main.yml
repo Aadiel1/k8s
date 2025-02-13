@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Allows manual trigger
+  workflow_dispatch:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
@@ -20,13 +20,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Google Auth
+      id: auth
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
     - name: Setup gcloud CLI
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ secrets.GCP_PROJECT }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
         install_components: 'gke-gcloud-auth-plugin'
-        export_default_credentials: true
 
     - name: Verify GCP credentials
       run: |
@@ -66,7 +70,7 @@ jobs:
         kubectl get pods -o wide
 
     - name: Post-deployment cleanup
-      if: always()  # Run even if previous steps failed
+      if: always()
       run: |
         # Add any cleanup steps here if needed
         echo "Deployment process completed"
