@@ -22,13 +22,13 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    # 3. Configure kubectl to interact with GKE
-    - name: Set up kubectl
+    # 3. Decode and use the service account key
+    - name: Authenticate to GKE
       env:
-        CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE: ${{ secrets.GCP_SA_KEY }}
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       run: |
-        echo "Authenticating and configuring gcloud..."
-        gcloud auth activate-service-account --key-file="${{ secrets.GCP_SA_KEY }}"
+        echo "$GCP_SA_KEY" > $HOME/gcloud-key.json
+        gcloud auth activate-service-account --key-file=$HOME/gcloud-key.json
         gcloud config set project ${{ secrets.GCP_PROJECT }}
         gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER }} --zone ${{ secrets.GKE_ZONE }}
         kubectl version --client
