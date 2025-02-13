@@ -53,7 +53,7 @@ jobs:
         # List files in current directory
         ls -la
         # Apply all yaml files in current directory
-        kubectl apply -f .
+        kubectl apply -f ./manifests
         kubectl wait --for=condition=available --timeout=300s deployment --all -n default
 
     - name: Verify deployment
